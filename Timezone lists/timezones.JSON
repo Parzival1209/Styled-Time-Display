@@ -62,6 +62,7 @@
   "WITA": "Central Indonesia Time",
   "AWST": "Australia Western Standard Time",
   "HKT": "Hong Kong Time",
+  "TST": "Taiwan Standard Time",
   "ACWST": "Australian Central Western Standard Time",
   "JST": "Japan Standard Time",
   "KST": "Korea Standard Time",
@@ -87,4 +88,5 @@
   "PHOT": "Phoenix Island Time",
   "WSST": "Samoa Standard Time (Samoa)",
   "LINT": "Line Islands Time"
+
 }
