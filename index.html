@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Styled Time Display</title>
-    <link rel="icon" href="Styled Time Display Favicon.png" type="image/png">
+    <link rel="icon" href="./Image assests/Styled Time Display Favicon.png" type="image/png">
     <style>
         body {
             background-color: #ffffff;
@@ -17,7 +17,7 @@
             box-sizing: border-box;
             transition: background-color 0.5s ease;
             height: 100vh;
-            overflow: hidden; /* Remove scrollbars */
+            overflow: hidden;
         }
 
         body:hover {
@@ -54,7 +54,7 @@
             color: #6F139F;
             font-size: 2.25em;
             font-weight: bold;
-            cursor: url('Enter-full-screen.png') 12 12, pointer;
+            cursor: url('./Image Assests/Enter-full-screen.png') 12 12, pointer;
             transition: cursor 0.2s ease;
         }
 
@@ -64,7 +64,7 @@
             font-size: 2.25em;
             font-weight: bold;
             line-height: 1.2;
-            cursor: url('Aero-down.png') 12 24, pointer;
+            cursor: url('./Image Assests/Aero-down.png') 12 24, pointer;
             transition: cursor 0.2s ease;
         }
 
@@ -73,7 +73,7 @@
             color: #9B1FDE;
             font-size: 2.25em;
             font-weight: bold;
-            cursor: url('Information.png') 0 0, pointer;
+            cursor: url('./Image Assests/Information.png') 0 0, pointer;
             transition: cursor 0.2s ease;
         }
 
@@ -118,7 +118,7 @@
             color: #9B1FDE;
             border: none;
             text-align: center;
-            cursor: url('Information.png') 0 0, pointer;
+            cursor: url('./Image Assests/Information.png') 0 0, pointer;
             transition: cursor 0.2s ease;
             overflow-y: auto;
             max-height: 112px;
@@ -126,14 +126,17 @@
         }
 
         .author-info::-webkit-scrollbar {
-            display: none; /* Hides the scrollbar in WebKit browsers */
+            display: none;
         }
     </style>
     <script>
+        let devToolsTimeout1;
+        let devToolsTimeout2;
         let timezoneOffsets = {};
         function updateClock() {
             const timezoneSelector = document.querySelector('.timezone-selector');
             const selectedTimezone = timezoneSelector.value;
+            localStorage.setItem("savedTimezone", selectedTimezone);
 
             const now = new Date();
             const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
@@ -143,23 +146,18 @@
             const hours = adjustedTime.getHours().toString().padStart(2, '0');
             const minutes = adjustedTime.getMinutes().toString().padStart(2, '0');
             const seconds = adjustedTime.getSeconds().toString().padStart(2, '0');
-
-            // Update time
             document.querySelector('.time').textContent = `${hours}:${minutes}:${seconds}`;
 
-            // Update binary
             const binaryHours = parseInt(hours, 10).toString(2).padStart(8, '0');
             const binaryMinutes = parseInt(minutes, 10).toString(2).padStart(8, '0');
             const binarySeconds = parseInt(seconds, 10).toString(2).padStart(8, '0');
             document.querySelector('.binary').innerHTML = `${binaryHours}<br>${binaryMinutes}<br>${binarySeconds}`;
 
-            // Update hex
             const hexHours = parseInt(hours, 10).toString(16).toUpperCase().padStart(2, '0');
             const hexMinutes = parseInt(minutes, 10).toString(16).toUpperCase().padStart(2, '0');
             const hexSeconds = parseInt(seconds, 10).toString(16).toUpperCase().padStart(2, '0');
             document.querySelector('.hex').textContent = `${hexHours}:${hexMinutes}:${hexSeconds}`;
 
-            // Update date
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const day = adjustedTime.getDate();
@@ -183,13 +181,11 @@
             const isFullscreen = (window.innerHeight === screen.height && window.innerWidth === screen.width);
 
             if (isFullscreen) {
-                // Expand appearance for fullscreen
                 elements.forEach(element => {
                     element.style.height = '154px';
                 });
                 document.body.style.backgroundColor = '#000000';
             } else {
-                // Revert appearance for non-fullscreen
                 elements.forEach(element => {
                     element.style.height = '112px';
                 });
@@ -229,9 +225,9 @@
             const isFullscreen = (window.innerHeight === screen.height && window.innerWidth === screen.width);
 
             if (isFullscreen) {
-                timeElement.style.cursor = "url('Exit-full-screen.png') 12 12, pointer";
+                timeElement.style.cursor = "url('./Image Assests/Exit-full-screen.png') 12 12, pointer";
             } else {
-                timeElement.style.cursor = "url('Enter-full-screen.png') 12 12, pointer";
+                timeElement.style.cursor = "url('./Image Assests/Enter-full-screen.png') 12 12, pointer";
             }
         }
 
@@ -241,9 +237,9 @@
             const isExpanded = timezoneElement.style.display === 'block';
 
             if (isExpanded) {
-                binaryElement.style.cursor = "url('Aero-up.png') 12 1, pointer";
+                binaryElement.style.cursor = "url('./Image Assests/Aero-up.png') 12 1, pointer";
             } else {
-                binaryElement.style.cursor = "url('Aero-down.png') 12 24, pointer";
+                binaryElement.style.cursor = "url('./Image Assests/Aero-down.png') 12 24, pointer";
             }
         }
 
@@ -252,7 +248,7 @@
 
             document.addEventListener('fullscreenchange', fullscreenCursor);
             window.addEventListener('resize', fullscreenCursor);
-            binaryElement.addEventListener('click', toggleTimezoneSelector); // Toggling handles cursor update
+            binaryElement.addEventListener('click', toggleTimezoneSelector);
         }
 
         function setupElementListeners() {
@@ -281,11 +277,11 @@
             localStorage.setItem("devToolsOpened", "true");
             let newTab;
 
-            setTimeout(() => {
+            devToolsTimeout1 = setTimeout(() => {
                 newTab = window.open("about:blank", "_blank");
             }, 10000);
             
-            setTimeout(() => {
+            devToolsTimeout2 = setTimeout(() => {
                 if (newTab) {
                     localStorage.removeItem("devToolsOpened");
                     newTab.location.href = window.location.href;
@@ -294,7 +290,7 @@
             }, 10000);
         }
 
-        function detectDevToolsClose(callback) {
+        function detectDevToolsClose() {
             let previousWidth = window.innerWidth;
 
             setInterval(() => {
@@ -302,6 +298,8 @@
 
                 if (currentWidth > previousWidth) {
                     localStorage.removeItem("devToolsOpened");
+                    clearTimeout(devToolsTimeout1);
+                    clearTimeout(devToolsTimeout2);
                 }
 
                 previousWidth = currentWidth;
@@ -387,6 +385,8 @@
             }
             (async () => {
                 await loadTimezoneOffsets();
+                const timezoneSelector = document.querySelector('.timezone-selector');
+                timezoneSelector.value = localStorage.getItem("savedTimezone");
                 updateClock();
                 setInterval(updateClock, 1000);
                 updateClock();
