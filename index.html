@@ -386,7 +386,8 @@
             (async () => {
                 await loadTimezoneOffsets();
                 const timezoneSelector = document.querySelector('.timezone-selector');
-                timezoneSelector.value = localStorage.getItem("savedTimezone");
+                const savedTimezone = localStorage.getItem("savedTimezone");
+                if(savedTimezone) timezoneSelector.value = savedTimezone;
                 updateClock();
                 setInterval(updateClock, 1000);
                 updateClock();
