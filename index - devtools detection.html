@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Time Display</title>
+    <link rel="icon" href="./Image assests/Styled Time Display Favicon.png" type="image/png">
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #fff;
+            font-family: "Cascadia Mono Nerd Font", "DejaVu Sans Mono", "Consolas", "Menlo", monospace;
+            font-size-adjust: 0.55;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.5s ease;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body:hover {
+            cursor: none;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            height: calc(100vh - 24px);
+            width: calc(100vw - 20px);
+            margin: 10px;
+            gap: 0;
+        }
+
+        .time, .binary, .hex, .date {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 96.5%;
+            text-align: center;
+            height: 112px;
+            transition: height 0.5s ease;
+        }
+
+        .time {
+            border-top-right-radius: 15px;
+            border-top-left-radius: 15px;
+            background-color: #47B8FF;
+            color: #6F139F;
+            font-size: 2.25em;
+            font-weight: bold;
+            cursor: url("./Image Assests/Enter-full-screen.png") 12 12, pointer;
+            transition: cursor 0.2s ease;
+        }
+
+        .binary {
+            background-color: #3FA5F2;
+            color: #8519BF;
+            font-size: 2.25em;
+            font-weight: bold;
+            line-height: 1.2;
+            cursor: url("./Image Assests/Aero-down.png") 12 24, pointer;
+            transition: cursor 0.2s ease;
+        }
+
+        .hex {
+            background-color: #3792E5;
+            color: #9B1FDE;
+            font-size: 2.25em;
+            font-weight: bold;
+            cursor: url("./Image Assests/Information.png") 0 0, pointer;
+            transition: cursor 0.2s ease;
+        }
+
+        .date {
+            border-bottom-right-radius: 15px;
+            border-bottom-left-radius: 15px;
+            background-color: #317FD8;
+            color: #B026FF;
+            font-size: 2.25em;
+            font-weight: bold;
+        }
+
+        .date:hover {
+            cursor: none;
+        }
+
+        .timezone-selector {
+            margin-top: 0px;
+            display: none;
+            width: 99.7%;
+            padding: 20px;
+            font-size: 1.62em;
+            background-color: #3FA5F2;
+            color: #8519BF;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            transition: cursor 0.2s ease;
+        }
+
+        .timezone-selector:focus {
+            outline: none;
+        }
+
+        .author-info {
+            margin-top: 0px;
+            display: none;
+            width: 96.5%;
+            padding: 20px;
+            font-size: 1.62em;
+            background-color: #3792E5;
+            color: #9B1FDE;
+            border: none;
+            text-align: center;
+            cursor: url("./Image Assests/Information.png") 0 0, pointer;
+            transition: cursor 0.2s ease;
+            overflow-y: auto;
+            max-height: 112px;
+            scrollbar-width: none;
+        }
+
+        .author-info::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <script>
+        let wakeLock = null;
+        let devToolsTimeout1;
+        let devToolsTimeout2;
+        let timezoneOffsets = {};
+
+        function updateClock() {
+            const timezoneSelector = document.querySelector(".timezone-selector");
+            const selectedTimezone = timezoneSelector.value;
+            localStorage.setItem("savedTimezone", selectedTimezone);
+
+            const now = new Date();
+            const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+            const offset = timezoneOffsets[selectedTimezone] || 0;
+            const adjustedTime = new Date(utcTime + offset * 3600000);
+
+            const hours = adjustedTime.getHours().toString().padStart(2, "0");
+            const minutes = adjustedTime.getMinutes().toString().padStart(2, "0");
+            const seconds = adjustedTime.getSeconds().toString().padStart(2, "0");
+            document.querySelector(".time").textContent = `${hours}:${minutes}:${seconds}`;
+
+            const binaryHours = parseInt(hours, 10).toString(2).padStart(8, "0");
+            const binaryMinutes = parseInt(minutes, 10).toString(2).padStart(8, "0");
+            const binarySeconds = parseInt(seconds, 10).toString(2).padStart(8, "0");
+            document.querySelector(".binary").innerHTML = `${binaryHours}<br>${binaryMinutes}<br>${binarySeconds}`;
+
+            const hexHours = parseInt(hours, 10).toString(16).toUpperCase().padStart(2, "0");
+            const hexMinutes = parseInt(minutes, 10).toString(16).toUpperCase().padStart(2, "0");
+            const hexSeconds = parseInt(seconds, 10).toString(16).toUpperCase().padStart(2, "0");
+            document.querySelector(".hex").textContent = `${hexHours}:${hexMinutes}:${hexSeconds}`;
+
+            const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const day = adjustedTime.getDate();
+            let daySuffix;
+            if (day >= 11 && day <= 13) {
+                daySuffix = "th";
+            } else {
+                switch (day % 10) {
+                    case 1: daySuffix = "st"; break;
+                    case 2: daySuffix = "nd"; break;
+                    case 3: daySuffix = "rd"; break;
+                    default: daySuffix = "th";
+                }
+            }
+            const dateString = `${days[adjustedTime.getDay()]} ${adjustedTime.getFullYear()}<br>${months[adjustedTime.getMonth()]} ${day}${daySuffix}`;
+            document.querySelector(".date").innerHTML = dateString;
+        }
+
+        function toggleAppearance() {
+            const elements = document.querySelectorAll(".time, .binary, .hex, .date");
+
+            if (document.fullscreenElement) {
+                elements.forEach(element => {
+                    element.style.height = "154px";
+                });
+                document.body.style.backgroundColor = "#000000";
+            } else {
+                elements.forEach(element => {
+                    element.style.height = "112px";
+                });
+                document.body.style.backgroundColor = "#ffffff";
+            }
+        }
+
+        async function updateWakeLock() {
+            try {
+                if (document.fullscreenElement && document.visibilityState === "visible") {
+                    if (!wakeLock) {
+                        wakeLock = await navigator.wakeLock.request("screen");
+                    }
+                } else {
+                    if (wakeLock) {
+                        await wakeLock.release();
+                        wakeLock = null;
+                    }
+                }
+            } catch (err) {
+                console.error("Wake lock fail:", err);
+            }
+        }
+
+        function fullscreen() {
+            if (!document.fullscreenElement) {
+                const docElm = document.documentElement;
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullScreen) {
+                    docElm.webkitRequestFullScreen();
+                } else if (docElm.msRequestFullscreen) {
+                    docElm.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function fullscreenCursor() {
+            const timeElement = document.querySelector(".time");
+
+            if (document.fullscreenElement) {
+                timeElement.style.cursor = "url('./Image Assests/Exit-full-screen.png') 12 12, pointer";
+            } else {
+                timeElement.style.cursor = "url('./Image Assests/Enter-full-screen.png') 12 12, pointer";
+            }
+        }
+
+        function timezoneCursor() {
+            const timezoneElement = document.querySelector(".timezone-selector");
+            const isExpanded = timezoneElement.style.display === "block";
+            const binaryElement = document.querySelector(".binary");
+
+            if (isExpanded) {
+                binaryElement.style.cursor = "url('./Image Assests/Aero-up.png') 12 1, pointer";
+            } else {
+                binaryElement.style.cursor = "url('./Image Assests/Aero-down.png') 12 24, pointer";
+            }
+        }
+
+        function setupCursorChangeListeners() {
+            const binaryElement = document.querySelector(".binary");
+
+            window.addEventListener("resize", fullscreenCursor);
+            document.addEventListener("fullscreenchange", fullscreenCursor);
+            binaryElement.addEventListener("click", toggleTimezoneSelector);
+        }
+
+        function setupElementListeners() {
+            const hexElement = document.querySelector(".hex");
+            const timeElement = document.querySelector(".time");
+            const binaryElement = document.querySelector(".binary");
+            const authorElement = document.querySelector(".author-info");
+
+            timeElement.addEventListener("click", fullscreen);
+            hexElement.addEventListener("click", toggleAuthorInfo);
+            authorElement.addEventListener("click", toggleAuthorInfo);
+            binaryElement.addEventListener("click", toggleTimezoneSelector);
+        }
+
+        function setupF11Listener() {
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "F11") {
+                    event.preventDefault();
+                    fullscreen();
+                }
+            });
+        }
+
+        function closeDevTools() {
+            console.log("Hey, you! Yes you, the one who opened DevTools. Why are you inspecting my code?");
+            localStorage.setItem("devToolsOpened", "true");
+            let newTab;
+
+            devToolsTimeout1 = setTimeout(() => {
+                newTab = window.open("about:blank", "_blank");
+            }, 10000);
+            
+            devToolsTimeout2 = setTimeout(() => {
+                if (newTab) {
+                    localStorage.removeItem("devToolsOpened");
+                    newTab.location.href = window.location.href;
+                    window.close();
+                }
+            }, 10000);
+        }
+
+        function detectDevToolsClose() {
+            let previousWidth = window.innerWidth;
+
+            setInterval(() => {
+                let currentWidth = window.innerWidth;
+
+                if (currentWidth > previousWidth) {
+                    localStorage.removeItem("devToolsOpened");
+                    clearTimeout(devToolsTimeout1);
+                    clearTimeout(devToolsTimeout2);
+                }
+
+                previousWidth = currentWidth;
+            }, 1000);
+        }
+
+        function setupInspectListeners() {
+            let triggerDevTools = 0;
+
+            if (localStorage.getItem("devToolsOpened") === "true") {
+                closeDevTools();
+            }
+
+            document.addEventListener("keydown", (event) => {
+                if (
+                    (event.ctrlKey && event.shiftKey && event.key === "I") ||
+                    (event.ctrlKey && event.shiftKey && event.key === "J") ||
+                    (event.key === "F12")
+                ) {
+                    if (triggerDevTools === 0) {
+                        closeDevTools();
+                        triggerDevTools = 1;
+                    }
+                }
+            });
+
+            window.addEventListener("resize", () => {
+                if (window.outerWidth - window.innerWidth > 100) {
+                    if (triggerDevTools === 0) {
+                        closeDevTools();
+                        triggerDevTools = 1;
+                    }
+                }
+            });
+
+            detectDevToolsClose();
+        }
+
+        function toggleTimezoneSelector() {
+            const timezoneSelector = document.querySelector(".timezone-selector");
+            timezoneSelector.style.display = timezoneSelector.style.display === "none" ? "block" : "none";
+            timezoneCursor();
+        }
+
+        function toggleAuthorInfo() {
+            const authorInfo = document.querySelector(".author-info");
+            if (window.getComputedStyle(authorInfo).display === "none") {
+                authorInfo.style.display = "block";
+            } else {
+                authorInfo.style.display = "none";
+            }
+        }
+
+        function setupResizeListeners() {
+            window.addEventListener("resize", toggleAppearance);
+            document.addEventListener("visibilitychange", updateWakeLock);
+            document.addEventListener("fullscreenchange", updateWakeLock);
+            document.addEventListener("fullscreenchange", toggleAppearance);
+        }
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const timezoneSelector = document.querySelector(".timezone-selector");
+            timezoneSelector.style.display = "none";
+
+            const response = await fetch("https://raw.githubusercontent.com/Parzival1209/Styled-Time-Display/refs/heads/main/Timezone%20lists/timezones.JSON");
+            const timezones = await response.json();
+
+            Object.entries(timezones).forEach(([key, value]) => {
+                const option = document.createElement("option");
+                option.value = key;
+                option.textContent = value;
+                timezoneSelector.appendChild(option);
+            });
+
+            setupCursorChangeListeners();
+            setupElementListeners();
+            setupInspectListeners();
+            setupResizeListeners();
+            setupF11Listener();
+
+            async function loadTimezoneOffsets() {
+                const url = "https://raw.githubusercontent.com/Parzival1209/Styled-Time-Display/refs/heads/main/Timezone%20lists/timezoneOffsets.JSON";
+                const response = await fetch(url);
+                timezoneOffsets = await response.json();
+            }
+            (async () => {
+                await loadTimezoneOffsets();
+                const timezoneSelector = document.querySelector(".timezone-selector");
+                const savedTimezone = localStorage.getItem("savedTimezone");
+                if(savedTimezone) timezoneSelector.value = savedTimezone;
+                updateClock();
+                setInterval(updateClock, 1000);
+                updateClock();
+            })();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="time">01:23:45</div>
+        <div class="binary">
+            00000001<br>
+            00010111<br>
+            00101101
+        </div>
+        <select class="timezone-selector"></select>
+        <div class="hex">01:17:2D</div>
+        <div class="author-info">
+            Authors: ChatGPT and Kai Yaron<br>
+            Code: Code converted from Python to HTML<br>
+            HTML Code: 60% ChatGPT and 40% Kai Yaron<br>
+            Python Code: 10% ChatGPT and 90% Kai Yaron
+        </div>
+        <div class="date">Mon 2025<br>Jan 1st</div>
+    </div>
+</body>
+</html>
