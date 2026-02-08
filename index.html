@@ -6,84 +6,88 @@
     <title>Styled Time Display</title>
     <link rel="icon" href="./Image assests/Styled Time Display Favicon.png" type="image/png">
     <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #ffffff;
-            color: #fff;
-            font-family: "Cascadia Mono Nerd Font", "DejaVu Sans Mono", "Consolas", "Menlo", monospace;
-            font-size-adjust: 0.55;
-            text-align: center;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            transition: background-color 0.5s ease;
-            height: 100vh;
+            color: #000000;
             overflow: hidden;
+            text-align: center;
+            box-sizing: border-box;
+            font-size-adjust: 0.55;
+            background-color: #ffffff;
+            transition: background-color 0.5s ease;
+            font-family: "Cascadia Mono Nerd Font", "DejaVu Sans Mono", "Consolas", "Menlo", monospace;
         }
 
         body:hover {
             cursor: none;
         }
 
-        .container {
+        .clock-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 16px;
             display: flex;
-            flex-direction: column;
+            position: absolute;
             align-items: center;
             justify-content: center;
-            box-sizing: border-box;
-            height: calc(100vh - 24px);
-            width: calc(100vw - 20px);
-            margin: 10px;
-            gap: 0;
         }
 
-        .time, .binary, .hex, .date {
-            padding: 20px;
+        .clock {
+            width: 100%;
+            height: 100%;
             display: flex;
-            justify-content: center;
+            position: relative;
             align-items: center;
-            width: 96.5%;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .time, .binary, .hex, .date {       
+            display: flex;
+            padding: 1.25rem;
+            font-size: 2.25em;
+            font-weight: bold;
             text-align: center;
-            height: 112px;
-            transition: height 0.5s ease;
+            align-items: center;
+            justify-content: center;
+            width: calc(100vw - 32px);
+            transition: all 0.5s ease;
+            height: calc(100vh - 32px);
         }
 
         .time {
-            border-top-right-radius: 15px;
-            border-top-left-radius: 15px;
-            background-color: #47B8FF;
             color: #6F139F;
-            font-size: 2.25em;
-            font-weight: bold;
+            background-color: #47B8FF;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
             cursor: url("./Image Assests/Enter-full-screen.png") 12 12, pointer;
-            transition: cursor 0.2s ease;
         }
 
         .binary {
-            background-color: #3FA5F2;
             color: #8519BF;
-            font-size: 2.25em;
-            font-weight: bold;
             line-height: 1.2;
+            background-color: #3FA5F2;
             cursor: url("./Image Assests/Aero-down.png") 12 24, pointer;
-            transition: cursor 0.2s ease;
         }
 
         .hex {
-            background-color: #3792E5;
             color: #9B1FDE;
-            font-size: 2.25em;
-            font-weight: bold;
+            background-color: #3792E5;
             cursor: url("./Image Assests/Information.png") 0 0, pointer;
-            transition: cursor 0.2s ease;
         }
 
         .date {
-            border-bottom-right-radius: 15px;
-            border-bottom-left-radius: 15px;
-            background-color: #317FD8;
             color: #B026FF;
-            font-size: 2.25em;
-            font-weight: bold;
+            background-color: #317FD8;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
         }
 
         .date:hover {
@@ -91,17 +95,16 @@
         }
 
         .timezone-selector {
-            margin-top: 0px;
-            display: none;
-            width: 99.7%;
-            padding: 20px;
-            font-size: 1.62em;
-            background-color: #3FA5F2;
-            color: #8519BF;
             border: none;
-            text-align: center;
+            display: none;
             cursor: pointer;
-            transition: cursor 0.2s ease;
+            color: #8519BF;
+            padding: 1.25rem;
+            font-size: 1.62em;
+            text-align: center;
+            width: calc(100vw - 32px);
+            background-color: #3FA5F2;
+            transition: cursor 0.5s ease;
         }
 
         .timezone-selector:focus {
@@ -109,20 +112,18 @@
         }
 
         .author-info {
-            margin-top: 0px;
-            display: none;
-            width: 96.5%;
-            padding: 20px;
-            font-size: 1.62em;
-            background-color: #3792E5;
-            color: #9B1FDE;
             border: none;
-            text-align: center;
-            cursor: url("./Image Assests/Information.png") 0 0, pointer;
-            transition: cursor 0.2s ease;
+            display: none;
+            color: #9B1FDE;
+            padding: 1.25rem;
             overflow-y: auto;
-            max-height: 112px;
+            font-size: 1.62em;
+            text-align: center;
             scrollbar-width: none;
+            width: calc(100vw - 32px);
+            background-color: #3792E5;
+            transition: cursor 0.5s ease;
+            cursor: url("./Image Assests/Information.png") 0 0, pointer;
         }
 
         .author-info::-webkit-scrollbar {
@@ -178,17 +179,14 @@
 
         function toggleAppearance() {
             const elements = document.querySelectorAll(".time, .binary, .hex, .date");
-
             if (document.fullscreenElement) {
-                elements.forEach(element => {
-                    element.style.height = "154px";
-                });
                 document.body.style.backgroundColor = "#000000";
-            } else {
                 elements.forEach(element => {
-                    element.style.height = "112px";
-                });
+                    element.style.height = "calc(100vh - 32px)"});
+            } else {
                 document.body.style.backgroundColor = "#ffffff";
+                elements.forEach(element => {
+                    element.style.height = "calc(100vh - 32px)"});
             }
         }
 
@@ -197,13 +195,11 @@
                 if (document.fullscreenElement && document.visibilityState === "visible") {
                     if (!wakeLock) {
                         wakeLock = await navigator.wakeLock.request("screen");
-                        console.log("Wake lock set");
                     }
                 } else {
                     if (wakeLock) {
                         await wakeLock.release();
                         wakeLock = null;
-                        console.log("Wake lock released");
                     }
                 }
             } catch (err) {
@@ -346,22 +342,24 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <div class="time">01:23:45</div>
-        <div class="binary">
-            00000001<br>
-            00010111<br>
-            00101101
+    <div class="clock-container">
+        <div class="clock">
+            <div class="time">01:23:45</div>
+            <div class="binary">
+                00000001<br>
+                00010111<br>
+                00101101
+            </div>
+            <select class="timezone-selector"></select>
+            <div class="hex">01:17:2D</div>
+            <div class="author-info">
+                Authors: ChatGPT and Kai Yaron<br>
+                Code: Code converted from Python to HTML<br>
+                HTML Code: 60% ChatGPT and 40% Kai Yaron<br>
+                Python Code: 10% ChatGPT and 90% Kai Yaron
+            </div>
+            <div class="date">Mon 2025<br>Jan 1st</div>
         </div>
-        <select class="timezone-selector"></select>
-        <div class="hex">01:17:2D</div>
-        <div class="author-info">
-            Authors: ChatGPT and Kai Yaron<br>
-            Code: Code converted from Python to HTML<br>
-            HTML Code: 60% ChatGPT and 40% Kai Yaron<br>
-            Python Code: 10% ChatGPT and 90% Kai Yaron
-        </div>
-        <div class="date">Mon 2025<br>Jan 1st</div>
     </div>
 </body>
 </html>
