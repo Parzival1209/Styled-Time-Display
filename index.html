@@ -67,20 +67,20 @@
             background-color: #47B8FF;
             border-top-left-radius: 15px;
             border-top-right-radius: 15px;
-            cursor: url("./Image Assests/Enter-full-screen.png") 12 12, pointer;
+            cursor: url("./Image assests/Enter-full-screen.png") 12 12, pointer;
         }
 
         .binary {
             color: #8519BF;
             line-height: 1.2;
             background-color: #3FA5F2;
-            cursor: url("./Image Assests/Aero-down.png") 12 24, pointer;
+            cursor: url("./Image assests/Aero-down.png") 12 24, pointer;
         }
 
         .hex {
             color: #9B1FDE;
             background-color: #3792E5;
-            cursor: url("./Image Assests/Information.png") 0 0, pointer;
+            cursor: url("./Image assests/Information.png") 0 0, pointer;
         }
 
         .date {
@@ -123,7 +123,7 @@
             width: calc(100vw - 32px);
             background-color: #3792E5;
             transition: cursor 0.5s ease;
-            cursor: url("./Image Assests/Information.png") 0 0, pointer;
+            cursor: url("./Image assests/Information.png") 0 0, pointer;
         }
 
         .author-info::-webkit-scrollbar {
@@ -236,9 +236,9 @@
             const timeElement = document.querySelector(".time");
 
             if (document.fullscreenElement) {
-                timeElement.style.cursor = "url('./Image Assests/Exit-full-screen.png') 12 12, pointer";
+                timeElement.style.cursor = "url('./Image assests/Exit-full-screen.png') 12 12, pointer";
             } else {
-                timeElement.style.cursor = "url('./Image Assests/Enter-full-screen.png') 12 12, pointer";
+                timeElement.style.cursor = "url('./Image assests/Enter-full-screen.png') 12 12, pointer";
             }
         }
 
@@ -248,9 +248,9 @@
             const binaryElement = document.querySelector(".binary");
 
             if (isExpanded) {
-                binaryElement.style.cursor = "url('./Image Assests/Aero-up.png') 12 1, pointer";
+                binaryElement.style.cursor = "url('./Image assests/Aero-up.png') 12 1, pointer";
             } else {
-                binaryElement.style.cursor = "url('./Image Assests/Aero-down.png') 12 24, pointer";
+                binaryElement.style.cursor = "url('./Image assests/Aero-down.png') 12 24, pointer";
             }
         }
 
@@ -363,3 +363,4 @@
     </div>
 </body>
 </html>
+
