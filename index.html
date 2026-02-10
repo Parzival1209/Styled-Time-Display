@@ -99,12 +99,14 @@
             display: none;
             cursor: pointer;
             color: #8519BF;
-            padding: 1.25rem;
             font-size: 1.62em;
+            padding: 1.25rem 0;
             text-align: center;
+            font-size-adjust: 0.55;
             width: calc(100vw - 32px);
             background-color: #3FA5F2;
             transition: cursor 0.5s ease;
+            font-family: "Cascadia Mono Nerd Font", "DejaVu Sans Mono", "Consolas", "Menlo", monospace;
         }
 
         .timezone-selector:focus {
@@ -162,7 +164,7 @@
             const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
             const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const day = adjustedTime.getDate();
-            let daySuffix;
+            let daySuffix = "";
             if (day >= 11 && day <= 13) {
                 daySuffix = "th";
             } else {
@@ -308,16 +310,23 @@
         document.addEventListener("DOMContentLoaded", async function () {
             const timezoneSelector = document.querySelector(".timezone-selector");
             timezoneSelector.style.display = "none";
-
+            
             const response = await fetch("https://raw.githubusercontent.com/Parzival1209/Styled-Time-Display/refs/heads/main/Timezone%20lists/timezones.JSON");
             const timezones = await response.json();
+            
+            const hr = document.createElement("option");
+            hr.setAttribute("disabled", "");
 
+            hr.textContent = "───────────────────────────────No DST Timezones───────────────────────────────";
+            timezoneSelector.appendChild(hr.cloneNode(true));
             Object.entries(timezones).forEach(([key, value]) => {
                 const option = document.createElement("option");
                 option.value = key;
                 option.textContent = value;
                 timezoneSelector.appendChild(option);
             });
+            hr.textContent = "──────────────────────────DST Timezones (Coming Soon)──────────────────────────";
+            timezoneSelector.appendChild(hr.cloneNode(true));
 
             setupCursorChangeListeners();
             setupElementListeners();
@@ -363,4 +372,3 @@
     </div>
 </body>
 </html>
-
