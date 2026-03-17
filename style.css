@@ -1,0 +1,120 @@
+/* ===================== GLOBAL ===================== */
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	text-align: center;
+	font-size-adjust: 0.55;
+	background-color: #ffffff;
+	color: #000000;
+	transition: background-color 0.5s ease;
+	font-family: "Cascadia Mono Nerd Font", "DejaVu Sans Mono", "Consolas", "Menlo", monospace;
+}
+
+body:hover {
+	cursor: none;
+}
+
+/* ===================== LAYOUT ===================== */
+.clock-container {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	padding: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.clock {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+/* ===================== SHARED BLOCK STYLE ===================== */
+.time, .binary, .hex, .date {
+	width: calc(100vw - 32px);
+	height: calc(100vh - 32px);
+	padding: 1.25rem;
+	font-size: 2.25em;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	transition: all 0.5s ease;
+}
+
+/* ===================== SPECIFIC SECTIONS ===================== */
+.time {
+	color: #6F139F;
+	background-color: #47B8FF;
+	border-radius: 15px 15px 0 0;
+	cursor: url("./Image assests/Enter-full-screen.png") 12 12, pointer;
+}
+
+.binary {
+	color: #8519BF;
+	background-color: #3FA5F2;
+	line-height: 1.2;
+	cursor: url("./Image assests/Aero-down.png") 12 24, pointer;
+}
+
+.hex {
+	color: #9B1FDE;
+	background-color: #3792E5;
+	cursor: url("./Image assests/Information.png") 0 0, pointer;
+}
+
+.date {
+	color: #B026FF;
+	background-color: #317FD8;
+	border-radius: 0 0 15px 15px;
+}
+
+.date:hover {
+	cursor: none;
+}
+
+/* ===================== DROPDOWN ===================== */
+.timezone-selector {
+	display: none;
+	width: calc(100vw - 32px);
+	padding: 1.25rem 0;
+	font-size: 1.62em;
+	color: #8519BF;
+	background-color: #3FA5F2;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.timezone-selector:focus {
+	outline: none;
+}
+
+/* ===================== AUTHOR INFO ===================== */
+.author-info {
+	display: none;
+	width: calc(100vw - 32px);
+	padding: 1.25rem;
+	font-size: 1.62em;
+	color: #9B1FDE;
+	background-color: #3792E5;
+	overflow-y: auto;
+	scrollbar-width: none;
+	cursor: url("./Image assests/Information.png") 0 0, pointer;
+}
+
+.author-info::-webkit-scrollbar {
+	display: none;
+}
